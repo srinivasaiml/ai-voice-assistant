@@ -1,5 +1,4 @@
 import { Groq } from 'groq-sdk';
-import { GroqResponse } from '../types';
 
 const GROQ_API_KEY = import.meta.env.VITE_GROQ_API_KEY;
 
@@ -27,22 +26,21 @@ export class GroqService {
         messages: [
           {
             role: 'system',
-            content: `You are a helpful voice assistant like Alexa. Keep responses concise and conversational. 
-            If the user asks to open a website, respond with "Opening [website name]" and include the command "OPEN_WEBSITE:[url]" at the end.
-            
-            Supported websites:
-            - Google: google.com
-            - YouTube: youtube.com
-            - Facebook: facebook.com
-            - Twitter: twitter.com
-            - Instagram: instagram.com
-            - LinkedIn: linkedin.com
-            - Amazon: amazon.com
-            - Netflix: netflix.com
-            - Wikipedia: wikipedia.org
-            - GitHub: github.com
-            - Stack Overflow: stackoverflow.com
-            - Reddit: reddit.com`
+            content: `You are a helpful voice assistant like Alexa. Keep responses concise and conversational.
+             If the user asks to open a website, respond with "Opening [website name]" and include the command "OPEN_WEBSITE:[url]" at the end.
+             Supported websites:
+             - Google: google.com
+             - YouTube: youtube.com
+             - Facebook: facebook.com
+             - Twitter: twitter.com
+             - Instagram: instagram.com
+             - LinkedIn: linkedin.com
+             - Amazon: amazon.com
+             - Netflix: netflix.com
+             - Wikipedia: wikipedia.org
+             - GitHub: github.com
+             - Stack Overflow: stackoverflow.com
+             - Reddit: reddit.com`
           },
           ...messages.map(msg => ({
             role: msg.role as 'user' | 'assistant',

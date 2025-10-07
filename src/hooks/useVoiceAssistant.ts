@@ -37,11 +37,9 @@ export const useVoiceAssistant = () => {
     if (websiteMatch) {
       const url = websiteMatch[1].trim();
       const fullUrl = url.startsWith('http') ? url : `https://${url}`;
-      
-      // Open website in new tab
+     
       window.open(fullUrl, '_blank');
-      
-      // Remove the command from the response
+     
       return response.replace(/OPEN_WEBSITE:.*$/, '').trim();
     }
     return response;
@@ -52,28 +50,22 @@ export const useVoiceAssistant = () => {
 
     setState(prev => ({ ...prev, isProcessing: true, currentTranscript: '' }));
 
-    // Add user message
     addMessage(transcript, 'user');
 
     try {
-      // Get conversation history for context
       const conversationHistory = state.messages.slice(-10).map(msg => ({
         role: msg.sender === 'user' ? 'user' : 'assistant',
         content: msg.text
       }));
 
-      // Get AI response
       const response = await groqService.current.getResponse(transcript, conversationHistory);
-      
-      // Handle website commands
+     
       const cleanResponse = handleWebsiteCommand(response);
-      
-      // Add assistant message
+     
       addMessage(cleanResponse, 'assistant');
 
-      // Speak the response
       setState(prev => ({ ...prev, isProcessing: false, isSpeaking: true }));
-      
+     
       speechService.current.speak(cleanResponse, () => {
         setState(prev => ({ ...prev, isSpeaking: false }));
       });

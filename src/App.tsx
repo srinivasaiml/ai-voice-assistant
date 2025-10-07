@@ -1,153 +1,63 @@
-import React, { useEffect } from 'react';
-import VoiceCard from './components/VoiceCard';
+import React from 'react';
+import styled from 'styled-components';
 import ConversationHistory from './components/ConversationHistory';
-import ParticleBackground from './components/ParticleBackground';
 import FloatingElements from './components/FloatingElements';
+import ParticleBackground from './components/ParticleBackground';
+import VoiceCard from './components/VoiceCard';
 import { useVoiceAssistant } from './hooks/useVoiceAssistant';
-import styled, { keyframes } from 'styled-components';
-
+import GlobalStyles from './styles/GlobalStyles';
 const App: React.FC = () => {
-  const {
-    isListening,
-    isProcessing,
-    isSpeaking,
-    currentTranscript,
-    messages,
-    error,
-    toggleListening,
-    clearError,
-  } = useVoiceAssistant();
-
-  useEffect(() => {
-    if (error) {
-      const timer = setTimeout(() => {
-        clearError();
-      }, 5000);
-      return () => clearTimeout(timer);
-    }
-  }, [error, clearError]);
-
-  return (
-    <AppContainer>
-      <ParticleBackground />
-      <FloatingElements />
-      
-      <MainContent>
-        <VoiceCard
-          isListening={isListening}
-          isProcessing={isProcessing}
-          isSpeaking={isSpeaking}
-          currentTranscript={currentTranscript}
-          onToggleListening={toggleListening}
-        />
-        
-        {error && (
-          <ErrorMessage onClick={clearError}>
-            {error}
-            <CloseButton>×</CloseButton>
-          </ErrorMessage>
-        )}
-      </MainContent>
-      
-      <ConversationHistory messages={messages} />
-    </AppContainer>
-  );
+const {
+isListening,
+isProcessing,
+isSpeaking,
+currentTranscript,
+messages,
+toggleListening,
+} = useVoiceAssistant();
+return (
+<>
+<GlobalStyles />
+<AppWrapper>
+<ParticleBackground />
+<FloatingElements />
+<MainContent>
+<VoiceCard
+isListening={isListening}
+isProcessing={isProcessing}
+isSpeaking={isSpeaking}
+currentTranscript={currentTranscript}
+onToggleListening={toggleListening}
+/>
+</MainContent>
+<ConversationHistory messages={messages} />
+</AppWrapper>
+</>
+);
 };
-
-const AppContainer = styled.div`
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
-  position: relative;
-  background: linear-gradient(
-    135deg,
-    #667eea 0%,
-    #764ba2 50%,
-    #667eea 100%
-  );
-  background-size: 400% 400%;
-  animation: ${keyframes`
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-  `} 15s ease infinite;
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: 
-      radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
-      radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
-    pointer-events: none;
-    z-index: 1;
-  }
+const AppWrapper = styled.div`
+display: flex;
+height: 100vh;
+width: 100vw;
+overflow: hidden;
+position: relative; /* Add position relative for context /
+background-color: #f0f2f5; / A base background color */
+/* On mobile screens, stack the components vertically */
+@media (max-width: 600px) {
+flex-direction: column;
+}
 `;
-
-const MainContent = styled.div`
-  width: calc(100vw - 400px);
-  height: 100vh;
-  position: relative;
-  z-index: 2;
-
-  @media (max-width: 768px) {
-    width: 100vw;
-    height: 50vh;
-  }
-`;
-
-const ErrorMessage = styled.div`
-  position: fixed;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(255, 59, 48, 0.9);
-  color: white;
-  padding: 12px 20px;
-  border-radius: 8px;
-  font-size: 14px;
-  z-index: 1001;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  animation: slideDown 0.3s ease-out;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-
-  @keyframes slideDown {
-    from {
-      opacity: 0;
-      transform: translateX(-50%) translateY(-20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-    }
-  }
-
-  @media (max-width: 768px) {
-    left: 20px;
-    right: 20px;
-    transform: none;
-    width: auto;
-  }
-`;
-
-const CloseButton = styled.span`
-  font-size: 18px;
-  font-weight: bold;
-  opacity: 0.8;
-  transition: all 0.2s ease;
-  
-  &:hover {
-    opacity: 1;
-    transform: scale(1.1);
-  }
-`;
-
+const MainContent = styled.main`
+flex-grow: 1;
+display: flex;
+align-items: center;
+justify-content: center;
+height: 100%;
+position: relative; /* Ensure it has a stacking context /
+z-index: 10; / Keep it above background elements */
+/* On mobile, it should occupy the top half of the screen /
+@media (max-width: 600px) {
+height: 50vh;
+flex-grow: 0; / Disable flex-grow in column layout */
+}`;
 export default App;

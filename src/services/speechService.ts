@@ -6,7 +6,7 @@ export class SpeechService {
   constructor() {
     this.synthesis = window.speechSynthesis;
     this.isSupported = 'webkitSpeechRecognition' in window || 'SpeechRecognition' in window;
-    
+   
     if (this.isSupported) {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       this.recognition = new SpeechRecognition();
@@ -70,23 +70,36 @@ export class SpeechService {
   }
 
   speak(text: string, onEnd?: () => void): void {
-    // Cancel any ongoing speech
-    this.synthesis.cancel();
+  this.synthesis.cancel();
 
-    // Remove website commands from speech
-    const cleanText = text.replace(/OPEN_WEBSITE:.*$/g, '').trim();
-    
-    const utterance = new SpeechSynthesisUtterance(cleanText);
-    utterance.rate = 0.9;
-    utterance.pitch = 1;
-    utterance.volume = 1;
+  const cleanText = text.replace(/OPEN_WEBSITE:.*$/g, '').trim();
 
-    utterance.onend = () => {
-      if (onEnd) onEnd();
-    };
+  const voices = this.synthesis.getVoices();
+  const femaleVoice = voices.find(voice =>
+    voice.lang.startsWith('en') &&
+    (
+      voice.name.toLowerCase().includes('female') ||
+      voice.name.toLowerCase().includes('woman') ||
+      voice.name.toLowerCase().includes('samantha') ||
+      voice.name.toLowerCase().includes('google us english') && voice.name !== 'Google UK English Male'
+    )
+  );
 
-    this.synthesis.speak(utterance);
+  const utterance = new SpeechSynthesisUtterance(cleanText);
+  utterance.rate = 0.9;
+  utterance.pitch = 1;
+  utterance.volume = 1;
+
+  if (femaleVoice) {
+    utterance.voice = femaleVoice;
   }
+
+  utterance.onend = () => {
+    if (onEnd) onEnd();
+  };
+
+  this.synthesis.speak(utterance);
+}
 
   stopSpeaking() {
     this.synthesis.cancel();

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import styled, { keyframes } from 'styled-components';
+import styled from 'styled-components';
 import { Message } from '../types';
 
 interface ConversationHistoryProps {
@@ -9,282 +9,167 @@ interface ConversationHistoryProps {
 const ConversationHistory: React.FC<ConversationHistoryProps> = ({ messages }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
   useEffect(() => {
-    scrollToBottom();
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const formatTime = (date: Date) => {
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  const formatTime = (timestamp: Date | string) => {
+    const t = typeof timestamp === "string" ? new Date(timestamp) : timestamp;
+    return t.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   };
 
   return (
-    <HistoryContainer>
+    <Sidebar>
       <Header>
-        <h3>Conversation History</h3>
-        <MessageCount>{messages.length} messages</MessageCount>
+        <h2>Conversation</h2>
+        <span>{messages.length} messages</span>
       </Header>
-      
-      <MessagesContainer>
+      <MsgList>
         {messages.length === 0 ? (
-          <EmptyState>
-            <p>No conversations yet</p>
-            <p>Click the voice card to start talking!</p>
-          </EmptyState>
+          <EmptyMsg>
+            <strong>No conversation yet</strong>
+            <span>Start by typing or speaking!</span>
+          </EmptyMsg>
         ) : (
-          messages.map((message) => (
-            <MessageBubble key={message.id} $sender={message.sender}>
-              <MessageContent>
-                <MessageText>{message.text}</MessageText>
-                <MessageTime>{formatTime(message.timestamp)}</MessageTime>
-              </MessageContent>
-            </MessageBubble>
+          messages.map(msg => (
+            <MsgRow key={msg.id} $from={msg.sender}>
+              <Avatar $from={msg.sender}>
+                {msg.sender === "user" ? "🧑" : "🤖"}
+              </Avatar>
+              <Bubble $from={msg.sender}>
+                <p>{msg.text}</p>
+                <MsgMeta>{formatTime(msg.timestamp)}</MsgMeta>
+              </Bubble>
+            </MsgRow>
           ))
         )}
         <div ref={messagesEndRef} />
-      </MessagesContainer>
-    </HistoryContainer>
+      </MsgList>
+    </Sidebar>
   );
 };
 
-const HistoryContainer = styled.div`
+const Sidebar = styled.aside`
   position: fixed;
-  top: 0;
   right: 0;
-  width: 400px;
+  top: 0;
+  width: 420px;
   height: 100vh;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border-left: 1px solid rgba(255, 255, 255, 0.2);
+  background: #fafbfc;
+  border-left: 1.5px solid #ececec;
+  box-shadow: -8px 0 24px -8px rgba(41,59,74,0.11);
   display: flex;
   flex-direction: column;
-  z-index: 1000;
-  box-shadow: -5px 0 20px rgba(0, 0, 0, 0.1);
+  z-index: 200;
 
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(
-      135deg,
-      rgba(102, 126, 234, 0.05) 0%,
-      rgba(118, 75, 162, 0.05) 100%
-    );
-    pointer-events: none;
-    z-index: -1;
-  }
-
-  @media (max-width: 768px) {
-    width: 100%;
-    position: fixed;
+  @media (max-width: 600px) {
+    width: 100vw;
+    border-left: none;
+    border-top: 1.5px solid #ececec;
     top: auto;
     bottom: 0;
     height: 50vh;
-    border-left: none;
-    border-top: 1px solid rgba(255, 255, 255, 0.2);
   }
 `;
 
-const Header = styled.div`
-  padding: 20px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(15px);
-  position: relative;
+const Header = styled.header`
+  padding: 20px 24px 14px 24px;
+  background: #fff6fb;
+  border-bottom: 1.5px solid #f0e8f4;
+  display: flex;
+  align-items: end;
 
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 2px;
-    background: linear-gradient(90deg, 
-      transparent 0%, 
-      rgba(102, 126, 234, 0.5) 50%, 
-      transparent 100%
-    );
+  h2 {
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0;
+    color: #383655;
+    letter-spacing: 0.4px;
   }
 
-  h3 {
-    margin: 0 0 5px 0;
-    color: #333;
-    font-size: 18px;
-    font-weight: 600;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  span {
+    margin-left: auto;
+    color: #b1aac7;
+    font-size: 13px;
+    font-weight: 500;
   }
 `;
 
-const MessageCount = styled.div`
-  color: #666;
-  font-size: 12px;
-  animation: ${keyframes`
-    0% { opacity: 0.6; }
-    100% { opacity: 1; }
-  `} 1s ease-in-out infinite alternate;
-`;
-
-const MessagesContainer = styled.div`
+const MsgList = styled.ul`
   flex: 1;
   overflow-y: auto;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  position: relative;
+  padding: 28px 18px 16px 18px;
+  margin: 0;
+  list-style: none;
+  background: linear-gradient(155deg, #eef2fb 0%, #f6f9fc 100%);
+`;
 
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: 
-      radial-gradient(circle at 20% 20%, rgba(102, 126, 234, 0.03) 0%, transparent 50%),
-      radial-gradient(circle at 80% 80%, rgba(118, 75, 162, 0.03) 0%, transparent 50%);
-    pointer-events: none;
-    z-index: 0;
+const EmptyMsg = styled.li`
+  margin: 12vh 0 0 0;
+  text-align: center;
+  color: #bbb;
+
+  strong {
+    font-size: 17px;
+    color: #757197;
   }
 
-  &::-webkit-scrollbar {
-    width: 6px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.1);
-    border-radius: 3px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.3);
-    border-radius: 3px;
-    transition: background 0.3s ease;
-  }
-
-  &::-webkit-scrollbar-thumb:hover {
-    background: rgba(0, 0, 0, 0.5);
+  span {
+    display: block;
+    margin-top: 8px;
+    font-size: 14px;
+    color: #9d97b5;
   }
 `;
 
-const EmptyState = styled.div`
+const MsgRow = styled.li<{ $from: "user" | "assistant" }>`
   display: flex;
-  flex-direction: column;
+  align-items: flex-end;
+  margin-bottom: 22px;
+  flex-direction: ${(p) => (p.$from === "user" ? "row-reverse" : "row")};
+`;
+
+const Avatar = styled.div<{ $from: "user" | "assistant" }>`
+  width: 40px;
+  height: 40px;
+  background: ${(p) => (p.$from === "user" ? "#dedcfc" : "#f6effd")};
+  border: 2.5px solid ${(p) => (p.$from === "user" ? "#7e85f5" : "#c9aad6")};
+  color: #5f5db6;
+  border-radius: 50%;
+  display: flex;
   align-items: center;
   justify-content: center;
-  height: 100%;
-  color: #666;
-  text-align: center;
-  position: relative;
-  z-index: 1;
+  font-size: 23px;
+  font-weight: bold;
+  margin: ${(p) => (p.$from === "user" ? "0 0 0 10px" : "0 10px 0 0")};
+  box-shadow: 0 2px 14px 0 rgba(140, 120, 220, 0.07);
+`;
+
+const Bubble = styled.div<{ $from: "user" | "assistant" }>`
+  max-width: 73%;
+  padding: 13px 18px 11px 18px;
+  background: ${(p) =>
+    p.$from === "user"
+      ? "linear-gradient(108deg, #798afc 0%, #7042dd 100%)"
+      : "#ffffff"};
+  color: ${(p) => (p.$from === "user" ? "#fff" : "#392f41")};
+  border-radius: 16px;
+  box-shadow: 0 4px 15px 0 rgba(124, 78, 230, 0.07);
+  font-size: 15px;
+  display: flex;
+  flex-direction: column;
 
   p {
-    margin: 5px 0;
-  }
-
-  p:first-child {
-    font-weight: 600;
-    font-size: 16px;
-    animation: ${keyframes`
-      0%, 100% { opacity: 0.8; }
-      50% { opacity: 1; }
-    `} 2s ease-in-out infinite;
-  }
-
-  p:last-child {
-    font-size: 14px;
-    opacity: 0.8;
+    margin: 0 0 4px 0;
+    word-break: break-word;
   }
 `;
 
-const MessageBubble = styled.div<{ $sender: 'user' | 'assistant' }>`
-  display: flex;
-  justify-content: ${props => props.$sender === 'user' ? 'flex-end' : 'flex-start'};
-  animation: slideIn 0.3s ease-out;
-  position: relative;
-  z-index: 1;
-
-  @keyframes slideIn {
-    from {
-      opacity: 0;
-      transform: translateY(10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  &:hover {
-    transform: translateY(-2px);
-    transition: transform 0.2s ease;
-  }
-`;
-
-const MessageContent = styled.div<{ $sender?: 'user' | 'assistant' }>`
-  max-width: 80%;
-  padding: 12px 16px;
-  border-radius: 18px;
-  background: ${props => props.$sender === 'user' 
-    ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' 
-    : 'rgba(0, 0, 0, 0.05)'};
-  backdrop-filter: blur(10px);
-  color: ${props => props.$sender === 'user' ? 'white' : '#333'};
-  box-shadow: 
-    0 4px 12px rgba(0, 0, 0, 0.1),
-    ${props => props.$sender === 'user' 
-      ? '0 0 20px rgba(102, 126, 234, 0.3)' 
-      : '0 0 10px rgba(0, 0, 0, 0.05)'};
-  position: relative;
-  transition: all 0.3s ease;
-
-  &::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    padding: 1px;
-    background: ${props => props.$sender === 'user' 
-      ? 'linear-gradient(135deg, rgba(255,255,255,0.3), transparent)' 
-      : 'linear-gradient(135deg, rgba(0,0,0,0.1), transparent)'};
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    mask-composite: xor;
-    pointer-events: none;
-  }
-
-  &:hover {
-    transform: scale(1.02);
-    box-shadow: 
-      0 6px 16px rgba(0, 0, 0, 0.15),
-      ${props => props.$sender === 'user' 
-        ? '0 0 30px rgba(102, 126, 234, 0.4)' 
-        : '0 0 15px rgba(0, 0, 0, 0.1)'};
-  }
-`;
-
-const MessageText = styled.p`
-  margin: 0 0 5px 0;
-  line-height: 1.4;
-  font-size: 14px;
-  word-wrap: break-word;
-  text-shadow: ${props => props.theme?.sender === 'user' 
-    ? '0 1px 2px rgba(0,0,0,0.2)' 
-    : '0 1px 1px rgba(255,255,255,0.8)'};
-  position: relative;
-`;
-
-const MessageTime = styled.div`
+const MsgMeta = styled.span`
   font-size: 11px;
-  opacity: 0.7;
+  opacity: 0.64;
   text-align: right;
-  font-weight: 500;
-  letter-spacing: 0.5px;
+  margin-left: auto;
 `;
 
 export default ConversationHistory;

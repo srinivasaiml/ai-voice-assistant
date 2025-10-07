@@ -2,7 +2,7 @@ export interface Message {
   id: string;
   text: string;
   sender: 'user' | 'assistant';
-  timestamp: Date;
+  timestamp: Date | string;
 }
 
 export interface VoiceAssistantState {
@@ -15,9 +15,9 @@ export interface VoiceAssistantState {
 }
 
 export interface GroqResponse {
-  choices: Array<{
+  choices: {
     message: {
       content: string;
     };
-  }>;
+  }[];
 }

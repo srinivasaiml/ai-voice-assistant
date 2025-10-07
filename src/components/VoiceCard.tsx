@@ -1,3 +1,5 @@
+
+
 import React from 'react';
 import styled, { keyframes } from 'styled-components';
 
@@ -212,12 +214,13 @@ const VoiceCard: React.FC<VoiceCardProps> = ({
 const StyledWrapper = styled.div`
   /* Added from original component to make the wrapper fill the screen */
   width: 100%;
-  height: 100vh;
+  height: 100%;
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  
+  position: relative; /* Needed for status-overlay positioning */
+
   /* Status display styles from the original VoiceCard */
   .status-overlay {
     position: absolute;
@@ -226,6 +229,7 @@ const StyledWrapper = styled.div`
     transform: translateX(-50%);
     text-align: center;
     z-index: 1000;
+    width: 90%; /* Ensure it doesn't overflow on small screens */
     animation: ${keyframes`
       0% { opacity: 0; transform: translateX(-50%) translateY(20px); }
       100% { opacity: 1; transform: translateX(-50%) translateY(0); }
@@ -245,12 +249,12 @@ const StyledWrapper = styled.div`
     font-size: 16px;
     font-style: italic;
     max-width: 400px;
+    margin: 0 auto;
     word-wrap: break-word;
   }
-  
+ 
   .grid {
     --perspective: 800px;
-
     position: absolute;
     left: 0;
     right: 0;
@@ -307,6 +311,7 @@ const StyledWrapper = styled.div`
     z-index: 9;
     transform-style: preserve-3d;
     cursor: pointer;
+    transition: transform 0.3s ease; /* Added for smooth scaling */
   }
 
   .card {
@@ -648,6 +653,8 @@ const StyledWrapper = styled.div`
       scale3d(1, 1, 1);
   }
 
+  /* ... hover effects for grid areas ... */
+
   .area:nth-child(15):hover ~ .wrap .card {
     transform: perspective(var(--perspective)) rotateX(-15deg) rotateY(15deg)
       scale3d(1, 1, 1);
@@ -711,214 +718,114 @@ const StyledWrapper = styled.div`
       scale3d(1, 1, 1);
   }
 
+  /* ... keyframes ... */
   @keyframes lines {
-    0% {
-      transform: scale(0.41);
-    }
-
-    15% {
-      transform: scale(0.37);
-    }
-
-    36% {
-      transform: scale(0.41);
-    }
-
-    50% {
-      transform: scale(0.38);
-    }
-
-    65% {
-      transform: scale(0.43);
-    }
-
-    80% {
-      transform: scale(0.39);
-    }
-
-    100% {
-      transform: scale(0.41);
-    }
+    0% { transform: scale(0.41); }
+    15% { transform: scale(0.37); }
+    36% { transform: scale(0.41); }
+    50% { transform: scale(0.38); }
+    65% { transform: scale(0.43); }
+    80% { transform: scale(0.39); }
+    100% { transform: scale(0.41); }
   }
 
   @keyframes line {
-    0% {
-      stroke-dashoffset: 10;
-    }
-    50% {
-      stroke-dashoffset: 45;
-    }
-    100% {
-      stroke-dashoffset: 10;
-    }
+    0% { stroke-dashoffset: 10; }
+    50% { stroke-dashoffset: 45; }
+    100% { stroke-dashoffset: 10; }
   }
 
   @keyframes rotate {
-    from {
-      transform: rotate(0);
-    }
-    to {
-      transform: rotate(360deg);
-    }
+    from { transform: rotate(0); }
+    to { transform: rotate(360deg); }
   }
 
   @keyframes circle1 {
-    0% {
-      transform: scale(0.97) translateZ(calc(20px + var(--z)));
-    }
-    15% {
-      transform: scale(1) translateZ(calc(30px + var(--z)));
-    }
-    30% {
-      transform: scale(0.98) translateZ(calc(20px + var(--z)));
-    }
-    45% {
-      transform: scale(1) translateZ(calc(30px + var(--z)));
-    }
-    60% {
-      transform: scale(0.97) translateZ(calc(20px + var(--z)));
-    }
-    85% {
-      transform: scale(1) translateZ(calc(30px + var(--z)));
-    }
-    100% {
-      transform: scale(0.97) translateZ(calc(20px + var(--z)));
-    }
+    0% { transform: scale(0.97) translateZ(calc(20px + var(--z))); }
+    15% { transform: scale(1) translateZ(calc(30px + var(--z))); }
+    30% { transform: scale(0.98) translateZ(calc(20px + var(--z))); }
+    45% { transform: scale(1) translateZ(calc(30px + var(--z))); }
+    60% { transform: scale(0.97) translateZ(calc(20px + var(--z))); }
+    85% { transform: scale(1) translateZ(calc(30px + var(--z))); }
+    100% { transform: scale(0.97) translateZ(calc(20px + var(--z))); }
   }
 
   @keyframes circle2 {
-    0% {
-      transform: scale(1) translateZ(calc(20px + var(--z)));
-    }
-    15% {
-      transform: scale(1.03) translateZ(calc(30px + var(--z)));
-    }
-    30% {
-      transform: scale(0.98) translateZ(calc(20px + var(--z)));
-    }
-    45% {
-      transform: scale(1.04) translateZ(calc(30px + var(--z)));
-    }
-    60% {
-      transform: scale(0.97) translateZ(calc(20px + var(--z)));
-    }
-    85% {
-      transform: scale(1.03) translateZ(calc(30px + var(--z)));
-    }
-    100% {
-      transform: scale(1) translateZ(calc(20px + var(--z)));
-    }
+    0% { transform: scale(1) translateZ(calc(20px + var(--z))); }
+    15% { transform: scale(1.03) translateZ(calc(30px + var(--z))); }
+    30% { transform: scale(0.98) translateZ(calc(20px + var(--z))); }
+    45% { transform: scale(1.04) translateZ(calc(30px + var(--z))); }
+    60% { transform: scale(0.97) translateZ(calc(20px + var(--z))); }
+    85% { transform: scale(1.03) translateZ(calc(30px + var(--z))); }
+    100% { transform: scale(1) translateZ(calc(20px + var(--z))); }
   }
 
   @keyframes growPath {
-    from {
-      stroke-dashoffset: 732;
-    }
-    to {
-      stroke-dashoffset: 0;
-    }
+    from { stroke-dashoffset: 732; }
+    to { stroke-dashoffset: 0; }
   }
 
   @keyframes reducePath {
-    from {
-      stroke-dashoffset: 0;
-    }
-    to {
-      stroke-dashoffset: 732;
-    }
+    from { stroke-dashoffset: 0; }
+    to { stroke-dashoffset: 732; }
   }
 
   @keyframes bgRotate {
-    0% {
-      transform: rotate(0deg);
-    }
-    20% {
-      transform: rotate(90deg);
-    }
-    40% {
-      transform: rotate(180deg) scale(0.95, 1);
-    }
-    60%,
-    100% {
-      transform: rotate(360deg);
-    }
+    0% { transform: rotate(0deg); }
+    20% { transform: rotate(90deg); }
+    40% { transform: rotate(180deg) scale(0.95, 1); }
+    60%, 100% { transform: rotate(360deg); }
   }
 
   @keyframes bg {
-    20% {
-      background-color: red;
-    }
-    40% {
-      background-color: #5eff7e;
-    }
-    60% {
-      background-color: #2cb5ff;
-    }
-    80% {
-      background-color: #fc63ff;
-    }
+    20% { background-color: red; }
+    40% { background-color: #5eff7e; }
+    60% { background-color: #2cb5ff; }
+    80% { background-color: #fc63ff; }
   }
 
   @keyframes wave {
-    0% {
-      transform: scale(1);
-      opacity: 0;
-      box-shadow: 0 0 30px rgba(106, 76, 172, 0.9);
-    }
-    35% {
-      transform: scale(1.3);
-      opacity: 1;
-    }
-    70%,
-    100% {
-      transform: scale(1.6);
-      opacity: 0;
-      box-shadow: 0 0 30px rgba(106, 76, 172, 0.3);
-    }
+    0% { transform: scale(1); opacity: 0; box-shadow: 0 0 30px rgba(106, 76, 172, 0.9); }
+    35% { transform: scale(1.3); opacity: 1; }
+    70%, 100% { transform: scale(1.6); opacity: 0; box-shadow: 0 0 30px rgba(106, 76, 172, 0.3); }
   }
 
   @keyframes footer {
-    0%,
-    3% {
-      transform: scaleY(0);
-      filter: blur(15px) brightness(1.5);
-    }
-    10%,
-    82% {
-      filter: blur(0);
-      transform: scaleY(1);
-    }
-    86% {
-      transform: scaleY(0);
-      filter: blur(15px) brightness(1.5);
-    }
+    0%, 3% { transform: scaleY(0); filter: blur(15px) brightness(1.5); }
+    10%, 82% { filter: blur(0); transform: scaleY(1); }
+    86% { transform: scaleY(0); filter: blur(15px) brightness(1.5); }
   }
 
   @keyframes labels {
-    0% {
-      transform: translateY(-30px) rotate(-30deg);
-      filter: blur(10px);
+    0% { transform: translateY(-30px) rotate(-30deg); filter: blur(10px); }
+    5% { transform: translateY(10px); filter: blur(0); }
+    10% { transform: translateY(0); opacity: 1; }
+    73% { transform: translateY(0); opacity: 1; }
+    76% { transform: translateY(-5px); filter: blur(0); }
+    80% { transform: translateY(15px); opacity: 0; filter: blur(5px); }
+  }
+
+  /* ====== RESPONSIVENESS ====== */
+  @media (max-width: 768px) { /* For tablets */
+    .wrap {
+      /* Scale down the entire card for a better fit */
+      transform: translateX(-50%) translateY(-50%) scale(0.9);
     }
-    5% {
-      transform: translateY(10px);
-      filter: blur(0);
+  }
+
+  @media (max-width: 480px) { /* For mobile phones */
+    .wrap {
+      /* Scale it down even more for small devices */
+      transform: translateX(-50%) translateY(-50%) scale(0.75);
     }
-    10% {
-      transform: translateY(0);
-      opacity: 1;
+    .status-overlay {
+      bottom: 20px; /* Give it some space from the bottom edge */
     }
-    73% {
-      transform: translateY(0);
-      opacity: 1;
+    .status-text {
+      font-size: 20px; /* Make status text smaller */
     }
-    76% {
-      transform: translateY(-5px);
-      filter: blur(0);
-    }
-    80% {
-      transform: translateY(15px);
-      opacity: 0;
-      filter: blur(5px);
+    .transcript {
+      font-size: 14px; /* Make transcript smaller */
     }
   }
 `;
